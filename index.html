@@ -6,8 +6,6 @@
     <title>For Noopur ❤️</title>
     <style>
         :root {
-            --pink-light: #ffafbd;
-            --pink-dark: #ffc3a0;
             --soft-pink: #ff85a2;
             --dark-pink: #ef476f;
         }
@@ -15,7 +13,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
         body {
-            /* Animated Gradient Background */
+            /* Animated Shimmering Gradient */
             background: linear-gradient(-45deg, #ffafbd, #ffc3a0, #ffdde1, #ee9ca7);
             background-size: 400% 400%;
             animation: gradientBG 10s ease infinite;
@@ -84,6 +82,7 @@
             cursor: pointer;
             transition: background 0.2s, transform 0.1s ease;
             white-space: nowrap;
+            touch-action: manipulation; /* Improves mobile response */
         }
 
         button:hover { background-color: var(--dark-pink); }
@@ -116,7 +115,9 @@
             opacity: 0;
             animation: fadeIn 0.8s forwards;
             display: block;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            color: #444;
         }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -158,8 +159,10 @@
 
         function dodge(e) {
             const btn = e.target;
-            const x = (Math.random() - 0.5) * 400;
-            const y = (Math.random() - 0.5) * 200;
+            // Slightly smaller range to keep it within phone screens
+            const x = (Math.random() - 0.5) * 200;
+            const y = (Math.random() - 0.5) * 150;
+            btn.style.position = 'relative';
             btn.style.transform = `translate(${x}px, ${y}px)`;
         }
 
@@ -199,13 +202,13 @@
                 const noBtn = document.getElementById('no-btn');
 
                 if (!hasAskedOnce) {
-                    // First time: Yes moves, No is clickable
+                    // First time: Yes button dodges
                     yesBtn.onmouseover = dodge;
-                    yesBtn.style.position = 'relative';
+                    yesBtn.ontouchstart = dodge;
                 } else {
-                    // Second time: No moves, Yes is clickable
+                    // Second time: No button dodges
                     noBtn.onmouseover = dodge;
-                    noBtn.style.position = 'relative';
+                    noBtn.ontouchstart = dodge;
                 }
             } 
             else if (pageId === 'rusli') {
@@ -219,7 +222,7 @@
                 document.body.classList.add('celebration-bg');
                 startCelebration();
                 
-                card.innerHTML = `<h1 id="t1"></h1><div id="msg-container"></div>`;
+                card.innerHTML = `<h1 id="t1"></h1><div id="msg-container" style="text-align: left;"></div>`;
                 await typeWordByWord('t1', "Yayayayayyya 🥳💖");
                 
                 const lines = [
@@ -236,7 +239,7 @@
                     span.className = 'fade-in-line';
                     span.innerText = line;
                     container.appendChild(span);
-                    await new Promise(r => setTimeout(r, 1200)); // Line delay
+                    await new Promise(r => setTimeout(r, 1500)); 
                 }
             }
         }
