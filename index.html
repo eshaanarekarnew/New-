@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>For Noopur ❤️</title>
     <style>
         :root {
@@ -13,7 +13,6 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
         body {
-            /* Animated Shimmering Gradient */
             background: linear-gradient(-45deg, #ffafbd, #ffc3a0, #ffdde1, #ee9ca7);
             background-size: 400% 400%;
             animation: gradientBG 10s ease infinite;
@@ -22,7 +21,7 @@
             justify-content: center;
             align-items: center;
             overflow: hidden;
-            transition: background 0.8s ease;
+            touch-action: none; /* Prevents accidental zooming while chasing buttons */
         }
 
         @keyframes gradientBG {
@@ -31,11 +30,7 @@
             100% { background-position: 0% 50%; }
         }
 
-        #hearts-container {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; z-index: 0;
-        }
+        #hearts-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
 
         .floating-heart {
             position: absolute;
@@ -51,49 +46,43 @@
 
         .card {
             background: rgba(255, 255, 255, 0.95);
-            padding: 40px 60px;
+            padding: 30px 40px;
             border-radius: 20px;
             box-shadow: 0 15px 35px rgba(0,0,0,0.1);
             text-align: center;
-            max-width: 750px;
-            width: 90%;
+            max-width: 600px;
+            width: 85%;
             position: relative;
             z-index: 10;
         }
 
-        h1 { color: var(--dark-pink); margin-bottom: 15px; font-size: 2.2rem; }
-        p { color: #555; margin-bottom: 25px; font-size: 1.25rem; line-height: 1.6; }
+        h1 { color: var(--dark-pink); margin-bottom: 15px; font-size: 1.8rem; }
+        p { color: #555; margin-bottom: 25px; font-size: 1.1rem; line-height: 1.6; }
 
         .btn-container {
             display: flex;
             justify-content: center;
-            gap: 20px;
+            gap: 15px;
             margin-top: 20px;
-            min-height: 60px;
+            min-height: 100px; /* Space for button movement */
+            position: relative;
         }
 
         button {
-            padding: 12px 30px;
+            padding: 12px 25px;
             border: none;
             border-radius: 50px;
             background-color: var(--soft-pink);
             color: white;
-            font-size: 1.1rem;
+            font-size: 1rem;
             cursor: pointer;
-            transition: background 0.2s, transform 0.1s ease;
+            transition: background 0.2s;
             white-space: nowrap;
-            touch-action: manipulation; /* Improves mobile response */
         }
 
-        button:hover { background-color: var(--dark-pink); }
+        .page-img { width: 180px; height: 180px; object-fit: cover; border-radius: 20px; margin-bottom: 20px; }
 
-        .page-img { width: 220px; height: 220px; object-fit: cover; border-radius: 20px; margin-bottom: 20px; }
-
-        /* Celebration Overrides */
-        .celebration-bg { 
-            background: #1a001a !important; 
-            animation: none !important;
-        }
+        .celebration-bg { background: #1a001a !important; animation: none !important; }
 
         .firework {
             position: absolute; width: 4px; height: 4px; background: white; border-radius: 50%;
@@ -153,17 +142,24 @@
             el.innerHTML = '';
             for (let word of words) {
                 el.innerHTML += word + ' ';
-                await new Promise(r => setTimeout(r, 200));
+                await new Promise(r => setTimeout(r, 150));
             }
         }
 
         function dodge(e) {
+            // For mobile: prevent the actual click from happening immediately
+            if (e.type === 'touchstart') {
+                e.preventDefault(); 
+            }
+            
             const btn = e.target;
-            // Slightly smaller range to keep it within phone screens
-            const x = (Math.random() - 0.5) * 200;
+            const x = (Math.random() - 0.5) * 250;
             const y = (Math.random() - 0.5) * 150;
-            btn.style.position = 'relative';
-            btn.style.transform = `translate(${x}px, ${y}px)`;
+            
+            btn.style.position = 'absolute';
+            btn.style.left = '50%';
+            btn.style.top = '50%';
+            btn.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
         }
 
         async function showPage(pageId) {
@@ -192,8 +188,8 @@
                     <img src="smile.jpg" class="page-img">
                     <h1 id="t1"></h1>
                     <div class="btn-container">
-                        <button id="yes-btn" onclick="showPage('final')">Yes</button>
-                        <button id="no-btn" onclick="showPage('rusli')">No</button>
+                        <button id="yes-btn">Yes</button>
+                        <button id="no-btn">No</button>
                     </div>`;
                 
                 await typeWordByWord('t1', "Will you be my Valentines?");
@@ -202,13 +198,17 @@
                 const noBtn = document.getElementById('no-btn');
 
                 if (!hasAskedOnce) {
-                    // First time: Yes button dodges
-                    yesBtn.onmouseover = dodge;
-                    yesBtn.ontouchstart = dodge;
+                    // First time: Yes dodges
+                    yesBtn.addEventListener('mouseover', dodge);
+                    yesBtn.addEventListener('touchstart', dodge);
+                    
+                    noBtn.onclick = () => showPage('rusli');
                 } else {
-                    // Second time: No button dodges
-                    noBtn.onmouseover = dodge;
-                    noBtn.ontouchstart = dodge;
+                    // Second time: No dodges, Yes is free
+                    noBtn.addEventListener('mouseover', dodge);
+                    noBtn.addEventListener('touchstart', dodge);
+                    
+                    yesBtn.onclick = () => showPage('final');
                 }
             } 
             else if (pageId === 'rusli') {
